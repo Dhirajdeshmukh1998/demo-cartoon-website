@@ -1,0 +1,89 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #111827;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 50px;
+  font-size: 40px;
+}
+
+.cartoon {
+  position: relative;
+  width: 120px;
+  height: 220px;
+  margin: auto;
+  animation: dance 1s infinite alternate;
+}
+
+.head {
+  width: 60px;
+  height: 60px;
+  background: #facc15;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.body {
+  width: 20px;
+  height: 80px;
+  background: #3b82f6;
+  margin: auto;
+}
+
+.left-hand,
+.right-hand {
+  width: 60px;
+  height: 10px;
+  background: #facc15;
+  position: absolute;
+  top: 80px;
+}
+
+.left-hand {
+  left: -10px;
+  transform: rotate(30deg);
+}
+
+.right-hand {
+  right: -10px;
+  transform: rotate(-30deg);
+}
+
+.left-leg,
+.right-leg {
+  width: 10px;
+  height: 60px;
+  background: #22c55e;
+  position: absolute;
+  bottom: 0;
+}
+
+.left-leg {
+  left: 45px;
+}
+
+.right-leg {
+  right: 45px;
+}
+
+@keyframes dance {
+  0% {
+    transform: rotate(-10deg);
+  }
+
+  100% {
+    transform: rotate(10deg);
+  }
+}
