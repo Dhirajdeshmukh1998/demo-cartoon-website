@@ -22,6 +22,12 @@ pipeline {
             }
         }
 
+        stage('Remove Old Image') {
+            steps {
+                sh 'docker rmi $IMAGE_NAME:$IMAGE_TAG || true'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
@@ -36,7 +42,9 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
 
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
                 }
             }
         }
@@ -50,8 +58,7 @@ pipeline {
         stage('Stop Old Container') {
             steps {
                 sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
+                docker rm -f $CONTAINER_NAME || true
                 '''
             }
         }
@@ -75,12 +82,17 @@ pipeline {
     }
 
     post {
+
         success {
             echo 'Deployment Successful'
         }
 
         failure {
             echo 'Pipeline Failed'
+        }
+
+        always {
+            sh 'docker image ls'
         }
     }
 }
