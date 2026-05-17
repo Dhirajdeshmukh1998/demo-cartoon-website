@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "dhirajdeshmukh/cartoon-site:v1"
+        IMAGE_NAME = "dhirajdeshmukh/cartoon-site"
+        IMAGE_TAG = "${BUILD_NUMBER}"
         CONTAINER_NAME = "cartoon-app"
     }
 
@@ -23,7 +24,26 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
             }
         }
 
@@ -42,7 +62,7 @@ pipeline {
                 docker run -d \
                 --name $CONTAINER_NAME \
                 -p 8080:80 \
-                $IMAGE_NAME
+                $IMAGE_NAME:$IMAGE_TAG
                 '''
             }
         }
@@ -51,6 +71,16 @@ pipeline {
             steps {
                 sh 'docker ps'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment Successful'
+        }
+
+        failure {
+            echo 'Pipeline Failed'
         }
     }
 }
